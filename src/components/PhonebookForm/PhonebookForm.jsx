@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import css from './PhonebookForm.module.css';
 import { Component } from 'react';
 
