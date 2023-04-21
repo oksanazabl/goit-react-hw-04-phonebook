@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import css from './PhonebookFilter.module.css';
 
 const PhonebookFilter = ({ onFilterSet, filter }) => {
@@ -15,6 +16,11 @@ const PhonebookFilter = ({ onFilterSet, filter }) => {
       </label>
     </>
   );
+};
+
+PhonebookFilter.propTypes = {
+  onFilterSet: PropTypes.func,
+  filter: PropTypes.string.isRequired,
 };
 
 export default PhonebookFilter;
