@@ -1,86 +1,83 @@
-import { Component } from 'react';
+
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
+import PropTypes from 'prop-types';
 import Container from './Container';
 import PhonebookForm from './PhonebookForm';
 import PhonebookContacts from './PhonebookContatcs';
 import PhonebookFilter from './PhonebookFilter';
 import filterContacts from '../utils/filterContacts';
 
-class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+function App() {
+const [contacts, setContacts] = useState([]);
+const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const conatcts = localStorage.getItem('contacts');
-    const parsedConatcts = JSON.parse(conatcts);
+useEffect(() => {
+const savedContacts = localStorage.getItem('contacts');
+if (savedContacts) {
+setContacts(JSON.parse(savedContacts));
+}
+}, []);
 
-    if (parsedConatcts) {
-      this.setState({ contacts: parsedConatcts });
-    }
-  }
+useEffect(() => {
+localStorage.setItem('contacts', JSON.stringify(contacts));
+}, [contacts]);
 
-  componentDidUpdate(prevState) {
-    const { contacts } = this.state;
-    if (prevState.contacts !== contacts) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }
-
-  handleSubmit = contact => {
-    const id = nanoid();
-    const { contacts } = this.state;
-    const isContactExist = contacts.some(
-      ({ name }) => name.toLowerCase() === contact.name.toLowerCase()
-    );
+const handleSubmit = (contact) => {
+const id = nanoid();
+const isContactExist = contacts.some(
+({ name }) => name.toLowerCase() === contact.name.toLowerCase()
+);
 
     if (isContactExist) {
       alert(`${contact.name} is already in contacts.`);
       return;
     }
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, { ...contact, id }],
-    }));
+    setContacts([...contacts, { ...contact, id }]);
   };
 
-  handleChange = event => {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
-  };
+  const handleFilterChange = (event) => {
+setFilter(event.target.value);
+};
 
-  handleFilterChange = event => {
-    this.setState({ filter: event.target.value });
-  };
+const handleDeleteContact = (contactId) => {
+setContacts(contacts.filter(({ id }) => id !== contactId));
+};
 
-  handleDeleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(({ id }) => id !== contactId),
-    }));
-  };
+const filteredContacts = filterContacts(contacts, filter);
 
-  render() {
-    const { contacts, filter } = this.state;
-    const newContacts = filterContacts(contacts, filter);
-    return (
-      <Container>
-        <h1>Phonebook</h1>
-        <PhonebookForm
-          onSubmit={this.handleSubmit}
-          handleChange={this.handleChange}
-        />
-        <h2>Contacts</h2>
-        <PhonebookFilter
-          filter={filter}
-          onFilterSet={this.handleFilterChange}
-        />
-        <PhonebookContacts
-          contacts={newContacts}
-          onDeleteContact={this.handleDeleteContact}
-        />
-      </Container>
-    );
-  }
+return (
+<Container>
+<h1>Phonebook</h1>
+<PhonebookForm onSubmit={handleSubmit} />
+<h2>Contacts</h2>
+<PhonebookFilter filter={filter} onFilterSet={handleFilterChange} />
+<PhonebookContacts
+     contacts={filteredContacts}
+     onDeleteContact={handleDeleteContact}
+   />
+</Container>
+);
 }
+
+PhonebookForm.propTypes = {
+onSubmit: PropTypes.func.isRequired,
+};
+
+PhonebookFilter.propTypes = {
+onFilterSet: PropTypes.func.isRequired,
+filter: PropTypes.string.isRequired,
+};
+
+PhonebookContacts.propTypes = {
+contacts: PropTypes.arrayOf(
+PropTypes.shape({
+id: PropTypes.string.isRequired,
+name: PropTypes.string.isRequired,
+number: PropTypes.string.isRequired,
+})
+),
+onDeleteContact: PropTypes.func.isRequired,
+};
 
 export default App;
