@@ -32,8 +32,8 @@ function App() {
     saveContactsToLocalStorage(updatedContacts);
   };
 
-  const handleFilterChange = value => {
-    setFilter(value);
+  const handleFilterChange = event => {
+    setFilter(event.target.value);
   };
 
   const handleDeleteContact = contactId => {
