@@ -3,16 +3,13 @@ import css from './PhonebookFilter.module.css';
 // import React, { useState } from 'react';
 
 const PhonebookFilter = ({ onFilterSet, filter }) => {
-const handleInputChange = event => {
-onFilterSet(event.target.value);
-};
   return (
     <>
       <label className={css.filter}>
         <p>Search contacts by name</p>
         <input
           name="filter"
-          onInput={handleInputChange}
+          onInput={onFilterSet}
           type="text"
           placeholder="Search contacts by name"
           value={filter}
@@ -21,6 +18,7 @@ onFilterSet(event.target.value);
     </>
   );
 };
+
 
 PhonebookFilter.propTypes = {
   onFilterSet: PropTypes.func,
