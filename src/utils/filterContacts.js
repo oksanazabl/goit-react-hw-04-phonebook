@@ -5,9 +5,6 @@ const filterContacts = (contacts, filter) => {
 
   const normalizedFilter = filter.toLowerCase().trim();
   return contacts.filter(({ name }) => {
-    if (!name) {
-      return false;
-    }
     return name.toLowerCase().includes(normalizedFilter);
   });
 };

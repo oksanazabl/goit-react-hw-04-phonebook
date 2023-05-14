@@ -7,30 +7,18 @@ import PhonebookFilter from './PhonebookFilter';
 import filterContacts from '../utils/filterContacts';
 
 function App() {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(
+    JSON.parse(localStorage.getItem('contacts')) || []
+  );
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
-    setContacts(storedContacts);
-  }, []);
+    saveContactsToLocalStorage(contacts);
+  }, [contacts]);
 
-useEffect(() => {
-  const handleBeforeUnload = () => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
+  const saveContactsToLocalStorage = updatedContacts => {
+    localStorage.setItem('contacts', JSON.stringify(updatedContacts));
   };
-
-  window.addEventListener('beforeunload', handleBeforeUnload);
-
-  return () => {
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-  };
-}, [contacts]);
-
-useEffect(() => {
-  const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
-  setContacts(storedContacts);
-}, []);
 
   const handleSubmit = contact => {
     const id = nanoid();
@@ -45,10 +33,9 @@ useEffect(() => {
 
     const newContact = { ...contact, id };
     setContacts(prevContacts => {
-    const updatedContacts = [...prevContacts, newContact];
-    saveContactsToLocalStorage(updatedContacts);
-    return updatedContacts;
-  });
+      const updatedContacts = [...prevContacts, newContact];
+      return updatedContacts;
+    });
   };
 
   const handleFilterChange = event => {
@@ -59,13 +46,7 @@ useEffect(() => {
     setContacts(prevContacts =>
       prevContacts.filter(({ id }) => id !== contactId)
     );
-   
-  saveContactsToLocalStorage(contacts.filter(({ id }) => id !== contactId));
   };
-
-  const saveContactsToLocalStorage = updatedContacts => {
-  localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-};
 
   const handleChange = event => {
     const { value } = event.target;
